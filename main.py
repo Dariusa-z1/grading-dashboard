@@ -30,6 +30,7 @@ ensure_state(
         'confidence_range': (0.0, 1.0),
         'error_threshold': 100,
     },
+    uploader_key=0,
 )
 
 # Sidebar
@@ -42,6 +43,7 @@ with st.sidebar:
         "Choose a CSV file",
         type=["csv"],
         help="Upload grading results CSV with columns: student_id, question_id, ta_score, llm_score, max_points",
+        key=f"upload_csv_{st.session_state.uploader_key}",
     )
 
     if uploaded_file is not None:
@@ -49,10 +51,25 @@ with st.sidebar:
         if df is not None:
             st.session_state.data = df
             st.session_state.processed_data = process_data(df)
-            st.success(f"✅ Loaded {len(df)} records")
+            st.session_state.loaded_from_upload = True
 
     # Filters live only when we have data
     if st.session_state.processed_data is not None:
+        st.success(f"✅ Loaded {len(st.session_state.data)} records")
+
+        # Restart button
+        if st.button("🔄 Restart", type="secondary", use_container_width=True):
+            st.session_state.data = None
+            st.session_state.processed_data = None
+            st.session_state.metrics = None
+            st.session_state.filters = {
+                'questions': [],
+                'students': [],
+                'confidence_range': (0.0, 1.0),
+                'error_threshold': 100,
+            }
+            st.session_state.uploader_key += 1
+            st.rerun()
         # Sidebar mini-metrics
         m = calculate_metrics(st.session_state.processed_data)
         c1, c2 = st.columns(2)
