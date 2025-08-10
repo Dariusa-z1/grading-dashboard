@@ -1,0 +1,19 @@
+.metric-card {
+  background-color: #f0f2f6;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+.stTabs [data-baseweb="tab-list"] { gap: 24px; }
+.stTabs [data-baseweb="tab"] { height: 50px; padding-left: 20px; padding-right: 20px; }
+
+div[data-testid="metric-container"] {
+  background-color: #f0f2f6;
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Centered footer */
+.footer { text-align:center; color:#666; margin-top: 24px; }
