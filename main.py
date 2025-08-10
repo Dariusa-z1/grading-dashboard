@@ -57,6 +57,14 @@ with st.sidebar:
     if st.session_state.processed_data is not None:
         st.success(f"✅ Loaded {len(st.session_state.data)} records")
 
+        # Sidebar mini-metrics
+        m = calculate_metrics(st.session_state.processed_data)
+        c1, c2 = st.columns(2)
+        with c1:
+            st.metric("Students", m['total_students'])
+        with c2:
+            st.metric("Questions", m['total_questions'])
+
         # Restart button
         if st.button("🔄 Restart", type="secondary", use_container_width=True):
             st.session_state.data = None
@@ -70,13 +78,6 @@ with st.sidebar:
             }
             st.session_state.uploader_key += 1
             st.rerun()
-        # Sidebar mini-metrics
-        m = calculate_metrics(st.session_state.processed_data)
-        c1, c2 = st.columns(2)
-        with c1:
-            st.metric("Students", m['total_students'])
-        with c2:
-            st.metric("Questions", m['total_questions'])
 
         # Filters
         from src.ui.tabs.overview import render_sidebar_filters
