@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from pathlib import Path
 
 from src.config import APP_TITLE, PAGE_ICON, LAYOUT
 from src.services.data_service import load_data, process_data
@@ -92,31 +93,22 @@ if st.session_state.processed_data is None:
         """
     )
 
-    if st.button("Generate Sample Data", type="primary"):
-        np.random.seed(42)
-        n_students, n_questions = 30, 6
-        data = []
-        for sid in range(1, n_students + 1):
-            for qid in range(1, n_questions + 1):
-                max_pts = 10 if qid <= 3 else 15
-                ta_score = np.random.uniform(max_pts * 0.4, max_pts * 0.95)
-                llm_score = ta_score + np.random.normal(0, max_pts * 0.1)
-                llm_score = np.clip(llm_score, 0, max_pts)
-                confidence = float(np.clip(1 - abs(llm_score - ta_score) / max_pts, 0.3, 1))
-                data.append({
-                    'student_id': f'S{sid:03d}',
-                    'question_id': f'Q{qid}',
-                    'ta_score': round(float(ta_score), 2),
-                    'llm_score': round(float(llm_score), 2),
-                    'max_points': max_pts,
-                    'confidence': round(confidence, 3),
-                    'flags': confidence < 0.5,
-                })
-        sample_df = pd.DataFrame(data)
-        st.session_state.data = sample_df
-        st.session_state.processed_data = process_data(sample_df)
-        st.success("✅ Sample data generated!")
-        st.rerun()
+    
+    if st.button("Load Built-in Sample", type="primary"):
+        # Load a bundled synthetic dataset from ./data/test_grading_data.csv
+        sample_path = Path(__file__).parent / "data" / "test_grading_data.csv"
+        try:
+            sample_df = pd.read_csv(sample_path)
+        except FileNotFoundError:
+            st.error(f"Couldn't find sample file at {sample_path}. Make sure it exists.")
+        except Exception as e:
+            st.error(f"Error reading sample file: {e}")
+        else:
+            st.session_state.data = sample_df
+            st.session_state.processed_data = process_data(sample_df)
+            st.success("✅ Sample data loaded!")
+            st.rerun()
+
 else:
     render_app(st.session_state.processed_data)
 
